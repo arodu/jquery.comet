@@ -5,7 +5,7 @@
     var comet = $.comet({
         url: 'comet.php',
         onMessage: function(m){
-            $('.date').append( m.date + '<br/>' )
+            // Actions
         }
     });
     ```
