@@ -9,13 +9,18 @@
             type: 'GET',
             dataType: 'json',
             autoStart: true,
-            url: null,
+            debug: false;
+            url: '', // required
             onMessage: null,
             onError: null,
-            debug: false;
         }, options);
 
-        if(debug){ console.log('init comet objet') }
+        if(settings.url == null || settings.url == ''){
+            console.error('url can not be empty');
+            return 1;
+        }
+
+        if(debug){ console.log('init comet object') }
 
         fetch = function() {
             if (open){ return 1; }
@@ -44,13 +49,13 @@
                     open = false;
                     if (textStatus == 'timeout') {
                         if(debug){ console.log('response timeout') }
-                        fetch();
+                        setTimeout(fetch, 1);
                     } else {
-                        if(debug){ console.error('response error') }
                         if (settings.onError != null) {
                             settings.onError(jqXHR, textStatus, errorThrown);
+                        }else{
+                            console.error('response error');
                         }
-                        // setTimeout(fetch, 10000);
                     }
                 }
             });
@@ -58,12 +63,12 @@
         }
 
         this.start = function(){
-            if (settings.url != null) {
+            if (settings.url != null && settings.url != '') {
                 open = false;
                 if(debug){ console.log('comet started!') }
                 fetch();
             }else{
-                if(debug){ console.error('url to open not found!') }
+                console.error('url to open not found!');
             }
         }
         

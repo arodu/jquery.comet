@@ -1,0 +1,22 @@
+{
+  "name": "jquery.comet",
+  "homepage": "https://github.com/arodu/jquery.comet",
+  "authors": [
+    "Alberto Rodriguez <arod.unerg@gmail.com>"
+  ],
+  "description": "jquery plugin for comet comunication",
+  "main": "jquery.comet.js",
+  "keywords": [
+    "jquery",
+    "plugin",
+    "comet"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
