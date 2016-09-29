@@ -12,11 +12,13 @@
             url: null,
             onMessage: null,
             onError: null,
+            debug: false;
         }, options);
 
+        if(debug){ console.log('init comet objet') }
 
         fetch = function() {
-            if (open){ return; }
+            if (open){ return 1; }
             open = true;
             connect = $.ajax({
                 url: settings.url,
@@ -40,10 +42,11 @@
                 //},
                 error: function(jqXHR, textStatus, errorThrown) {
                     open = false;
-                    console.log('error');
                     if (textStatus == 'timeout') {
+                        if(debug){ console.log('response timeout') }
                         fetch();
                     } else {
+                        if(debug){ console.error('response error') }
                         if (settings.onError != null) {
                             settings.onError(jqXHR, textStatus, errorThrown);
                         }
@@ -51,14 +54,16 @@
                     }
                 }
             });
+            return 0;
         }
 
         this.start = function(){
             if (settings.url != null) {
                 open = false;
+                if(debug){ console.log('comet started!') }
                 fetch();
             }else{
-                console.error('url to open not found!');
+                if(debug){ console.error('url to open not found!') }
             }
         }
         
@@ -66,8 +71,14 @@
             open = true;
             if( connect != null){
                 connect.abort();
+                if(debug){ console.log('comet stoped!') }
                 connect = null;
             }
+        }
+        
+        this.restart = function(){
+            this.stop();
+            this.start();
         }
         
         if(settings.autoStart){
