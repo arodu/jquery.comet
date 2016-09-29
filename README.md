@@ -1,5 +1,10 @@
 # Easy jQuery.comet
 
+* Install
+    ``` 
+    bower install arodu-jquery-comet
+    ```
+
 * Connection
     ``` javascript
     var comet = $.comet({
