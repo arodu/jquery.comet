@@ -13,6 +13,7 @@
                 dataType: 'json',
                 autoStart: true,
                 debug: false,
+                datetime: true,
                 url: '', // required
                 data: {},
             // Events
@@ -36,15 +37,20 @@
                 settings.beforeRequest();
             }
             
+            var data = settings.data;
+            if(settings.datetime){
+                data = $.extend(data, {datetime: datetime});
+            }
+            
             connect = $.ajax({
                 url: settings.url,
                 type: settings.type,
                 timeout: settings.timeout,
                 dataType: settings.dataType,
-                data: $.extend(settings.data, {datetime: datetime}),
+                data: data,
                 async: true,
-                cache: true,
-                contentType: 'multipart/form-data',
+                cache: false,
+                //contentType: 'multipart/form-data',
                 ifModified: true,
                 success: function(data, textStatus, jqXHR) {
                     //jQuery.comet.handle_update(data);
@@ -52,7 +58,7 @@
                         settings.onMessage(data, textStatus, jqXHR);
                     }
                     open = false;
-                    if (typeof data.datetime !== 'undefined') {
+                    if (settings.datetime===true && typeof data.datetime !== 'undefined') {
                         datetime = data.datetime;
                     }
                     setTimeout(fetch, settings.wait);
@@ -69,7 +75,8 @@
                         if (settings.onError != null) {
                             settings.onError(jqXHR, textStatus, errorThrown);
                         }else{
-                            console.error('response error: '+jqXHR);
+                            console.error('response error: ');
+                            console.error(jqXHR);
                         }
                     }
                 }
