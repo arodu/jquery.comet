@@ -1,9 +1,10 @@
 (function($) {
-    
+
     $.comet = function(options){
         var open = false;
         var connect = null;
         var datetime = 0;
+        var status = 'init' // init, open, closed, finished
 
         var settings = $.extend({
             //Options
@@ -27,21 +28,23 @@
             return 1;
         }
 
-        if(settings.debug){ console.log('init comet object') }
+        debug('init comet object')
 
         fetch = function() {
             if (open){ return 1; }
             open = true;
-            
+            if (status=='open' || status=='finished'){ return 1; }
+            status = 'open';
+
             if (settings.beforeRequest != null) {
-                settings.beforeRequest();
+              settings.beforeRequest();
             }
-            
+
             var data = settings.data;
             if(settings.datetime){
                 data = $.extend(data, {datetime: datetime});
             }
-            
+
             connect = $.ajax({
                 url: settings.url,
                 type: settings.type,
@@ -58,6 +61,7 @@
                         settings.onMessage(data, textStatus, jqXHR);
                     }
                     open = false;
+                    status = 'closed';
                     if (settings.datetime===true && typeof data.datetime !== 'undefined') {
                         datetime = data.datetime;
                     }
@@ -68,22 +72,23 @@
                 //},
                 error: function(jqXHR, textStatus, errorThrown) {
                     open = false;
+                    status = 'closed';
                     if (textStatus == 'timeout') {
-                        if(settings.debug){ console.log('response timeout') }
+                        debug('response timeout')
                         setTimeout(fetch, settings.wait);
                     } else {
                         if (settings.onError != null) {
                             settings.onError(jqXHR, textStatus, errorThrown);
                         }else{
-                            console.error('response error: ');
-                            console.error(jqXHR);
+                            console.error('response error: ' + textStatus);
+                            debug(jqXHR)
                         }
                     }
                 }
             });
             return 0;
         }
-        
+
         this.setData = function(data, recursively = false){
             settings.data = $.extend(recursively, settings.data, data);
         }
@@ -91,32 +96,38 @@
         this.start = function(){
             if (settings.url != null && settings.url != '') {
                 open = false;
-                if(settings.debug){ console.log('comet started!') }
+                status = 'closed';
+                debug('comet started!')
                 fetch();
             }else{
                 console.error('url to open not found!');
             }
         }
-        
+
         this.stop = function(){
             open = true;
+            status = 'finished';
             if( connect != null){
                 connect.abort();
-                if(settings.debug){ console.log('comet stoped!') }
+                debug('comet stoped!')
                 connect = null;
             }
         }
-        
+
         this.restart = function(){
             this.stop();
             this.start();
         }
-        
+
         if(settings.autoStart){
             this.start();
         }
 
+        function debug(msg){
+          if(settings.debug){ console.log(msg) }
+        }
+
         return this;
     }
-    
+
 }(jQuery));
